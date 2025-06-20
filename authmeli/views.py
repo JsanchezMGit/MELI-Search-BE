@@ -59,7 +59,6 @@ def search_products(request):
     try:
 
         query = request.GET.get("q", "")
-        print(query)
         if not query:
             return Response({"error": "Parámetro de búsqueda 'q' requerido"}, status=400)
         
@@ -70,24 +69,18 @@ def search_products(request):
             return Response({"error": "Token no encontrado"}, status=403)
 
         url = f"https://api.mercadolibre.com/products/search?status=active&site_id=MLM&q={query}"
-        print(url)
-        print(meli_token.access_token)
         headers = {
             "Authorization": f"Bearer {meli_token.access_token}"
         }
-        print(headers["Authorization"])
 
         r = requests.get(url, headers=headers)
-        print(r.status_code)
         if r.status_code != 200:
             return Response({"error": "Error en la API de Mercado Libre"}, status=r.status_code)
 
         results = r.json().get("results", [])
-        print(results)
         serialized = ProductSerializer(results, many=True)
-        print(serialized)
         return Response(serialized.data)
     except Exception as e:
         import traceback
-        print(traceback.format_exc())  # Log completo en consola
+        print(traceback.format_exc())
         return Response({"error": str(e)}, status=500)
