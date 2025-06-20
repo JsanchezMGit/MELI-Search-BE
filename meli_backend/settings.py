@@ -72,11 +72,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "meli_backend.wsgi.application"
 
-import psycopg2
+import psycopg
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
-conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+conn = psycopg.connect(DATABASE_URL, sslmode='require')
 
 
 # Password validation
