@@ -69,6 +69,7 @@ def search_products(request):
 
     url = f"https://api.mercadolibre.com/products/search?status=active&site_id=MLM&q={query}"
     print(url)
+    print(meli_token.access_token)
     headers = {
         "Authorization": f"Bearer {meli_token.access_token}"
     }
