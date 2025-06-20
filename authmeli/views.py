@@ -75,7 +75,7 @@ def search_products(request):
         headers = {
             "Authorization": f"Bearer {meli_token.access_token}"
         }
-        print(headers.Authorization)
+        print(headers["Authorization"])
 
         r = requests.get(url, headers=headers)
         print(r.status_code)
