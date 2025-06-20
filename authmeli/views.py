@@ -57,23 +57,30 @@ def meli_callback(request):
 @permission_classes([IsAuthenticated])
 def search_products(request):
     query = request.GET.get("q", "")
+    print(query)
     if not query:
         return Response({"error": "Parámetro de búsqueda 'q' requerido"}, status=400)
     
     try:
         meli_token = MercadoLibreToken.objects.get(user=request.user)
+        print(meli_token)
     except MercadoLibreToken.DoesNotExist:
         return Response({"error": "Token no encontrado"}, status=403)
 
     url = f"https://api.mercadolibre.com/products/search?status=active&site_id=MLM&q={query}"
+    print(url)
     headers = {
         "Authorization": f"Bearer {meli_token.access_token}"
     }
+    print(headers.Authorization)
 
     r = requests.get(url, headers=headers)
+    print(r.status_code)
     if r.status_code != 200:
         return Response({"error": "Error en la API de Mercado Libre"}, status=r.status_code)
 
     results = r.json().get("results", [])
+    print(results)
     serialized = ProductSerializer(results, many=True)
+    print(serialized)
     return Response(serialized.data)
