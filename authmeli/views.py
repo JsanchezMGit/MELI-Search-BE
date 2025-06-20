@@ -65,7 +65,7 @@ def search_products(request):
     except MercadoLibreToken.DoesNotExist:
         return Response({"error": "Token no encontrado"}, status=403)
 
-    url = f"https://api.mercadolibre.com/sites/MLM/search?q={query}"
+    url = f"https://api.mercadolibre.com/products/search?status=active&site_id=MLM&q={query}"
     headers = {
         "Authorization": f"Bearer {meli_token.access_token}"
     }
