@@ -6,6 +6,9 @@ from rest_framework import status
 from django.conf import settings
 import requests
 from .models import MercadoLibreToken
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
+from .serializers import ProductSerializer
 
 @api_view(["GET"])
 def meli_callback(request):
@@ -49,3 +52,28 @@ def meli_callback(request):
         "username": user.username,
         "access_token": token_data["access_token"],
     })
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def search_products(request):
+    query = request.GET.get("q", "")
+    if not query:
+        return Response({"error": "Parámetro de búsqueda 'q' requerido"}, status=400)
+
+    try:
+        meli_token = MercadoLibreToken.objects.get(user=request.user)
+    except MercadoLibreToken.DoesNotExist:
+        return Response({"error": "Token no encontrado"}, status=403)
+
+    url = f"https://api.mercadolibre.com/sites/MLM/search?q={query}"
+    headers = {
+        "Authorization": f"Bearer {meli_token.access_token}"
+    }
+
+    r = requests.get(url, headers=headers)
+    if r.status_code != 200:
+        return Response({"error": "Error en la API de Mercado Libre"}, status=r.status_code)
+
+    results = r.json().get("results", [])
+    serialized = ProductSerializer(results, many=True)
+    return Response(serialized.data)
