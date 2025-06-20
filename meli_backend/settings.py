@@ -72,11 +72,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "meli_backend.wsgi.application"
 
-import psycopg
+from decouple import config
+import dj_database_url
 
-DATABASE_URL = os.environ.get('DATABASE_URL')
+DATABASE_URL = config("DATABASE_URL", default=None)
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL no está definida. Verifica tus variables de entorno.")
 
-conn = psycopg.connect(DATABASE_URL, sslmode='require')
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+DATABASES = {
+    "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+}
 
 
 # Password validation
