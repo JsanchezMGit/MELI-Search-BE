@@ -32,7 +32,7 @@ def meli_callback(request):
     token_data = r.json()
 
     # Crea un usuario temporal (en producción debes validar mejor)
-    username = f"meli_user_{token_data['user_id']}"
+    username = "jasm"
     user, created = User.objects.get_or_create(username=username)
 
     # Guarda o actualiza el token
@@ -59,7 +59,7 @@ def search_products(request):
     query = request.GET.get("q", "")
     if not query:
         return Response({"error": "Parámetro de búsqueda 'q' requerido"}, status=400)
-
+    
     try:
         meli_token = MercadoLibreToken.objects.get(user=request.user)
     except MercadoLibreToken.DoesNotExist:
